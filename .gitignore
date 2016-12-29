@@ -84,3 +84,4 @@ core/assets/badlogic.jpg
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 >>>>>>> 6917764daf6668c2ab7e3d70fd9b94f937286189
+sh.exe.stackdump
