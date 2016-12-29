@@ -35,7 +35,7 @@ public class IslandGenerator extends ApplicationAdapter {
 		Gdx.graphics.setResizable(false);
 
 		reset();
-		
+
 		createIsland();
 		GenerateNoiseMap();
 
@@ -70,20 +70,20 @@ public class IslandGenerator extends ApplicationAdapter {
 
 		// Generate new map
 		if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-			
+
 			long t0 = System.currentTimeMillis();
 			System.out.println("Generating new texture");
 
-			OCTAVES = 5;
-			FREQUENCY = 5f;
-			AMPLITUDE = 1.0f;
+			OCTAVES = 9;
+			FREQUENCY = 7f;
+			AMPLITUDE = 0.9f;
 			radius = 400;
 
 			reset();
 
 			createIsland();
 			GenerateNoiseMap();
-			
+
 			long tf = System.currentTimeMillis() - t0;
 			System.out.println("Generated new texture in " + tf + "ms\n");
 		}
@@ -96,10 +96,7 @@ public class IslandGenerator extends ApplicationAdapter {
 		for (int x = 0; x < WINDOW_WIDTH; x++) {
 			for (int y = 0; y < WINDOW_HEIGHT; y++) {
 				double d = Math.sqrt(Math.pow(x - mx, 2) + Math.pow(y - my, 2));
-				if (d == 0)
-					islandTemplate[x][y] = 0.5d;
-				else
-					islandTemplate[x][y] = (radius / d) * 0.5;
+				islandTemplate[x][y] = (-Math.log10(d / 10)) + 1.5;
 			}
 		}
 	}
@@ -110,13 +107,14 @@ public class IslandGenerator extends ApplicationAdapter {
 				for (int o = 0; o < OCTAVES; o++) {
 					oct[x][y] += SimplexNoise.noise(x * (1.0f / (o * FREQUENCY)), y * (1.0f / (o * FREQUENCY)))
 							* (1 - (AMPLITUDE / ((float) o + 1)));
+					oct[x][y] += (islandTemplate[x][y]);
 				}
 				pixels[x][y] = RGB((float) oct[x][y], (float) oct[x][y], (float) oct[x][y]);
 			}
 		}
 	}
-	
-	public void reset(){
+
+	public void reset() {
 		screen = new Pixmap(WINDOW_WIDTH, WINDOW_HEIGHT, Pixmap.Format.RGB888);
 		renderer = new SpriteBatch();
 		oct = new double[WINDOW_WIDTH][WINDOW_HEIGHT];
