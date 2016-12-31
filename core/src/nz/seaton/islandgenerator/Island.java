@@ -30,6 +30,8 @@ public class Island {
 	}
 
 	public void generate() {
+		long last = System.currentTimeMillis();
+		
 		heightmap = new double[w][h];
 		SimplexNoise.init(seed, w, h);
 
@@ -46,9 +48,12 @@ public class Island {
 					heightmap[x][y] = 0;
 			}
 		}
+		
+		System.out.println("New heightmap generated in " + (System.currentTimeMillis()-last) + "ms\n");
 	}
 
 	public void createTexture() {
+		long last = System.currentTimeMillis();
 		if (tex != null)
 			tex.dispose();
 
@@ -135,7 +140,8 @@ public class Island {
 
 		tex = new Texture(pixels);
 		pixels.dispose();
-
+		
+		System.out.println("New texture generated in " + (System.currentTimeMillis()-last) + "ms\n");
 	}
 	
 	private float lerp(float start, float end, float x){

@@ -3,7 +3,6 @@ package nz.seaton.islandgenerator;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -18,8 +17,6 @@ public class IslandGenerator extends ApplicationAdapter {
 	public static float PERSISTANCE = 0.7f;
 	
 	public static RenderingMode renderMode = RenderingMode.CONTOURCOLOR;
-
-	double[][] islandTemplate;
 
 	SpriteBatch renderer;
 	
@@ -96,9 +93,5 @@ public class IslandGenerator extends ApplicationAdapter {
 	public void dispose() {
 		renderer.dispose();
 		island.dispose();
-	}
-
-	public static int RGB(float r, float g, float b) {
-		return Color.rgba8888(new Color(r, g, b, 1.0f));
 	}
 }
