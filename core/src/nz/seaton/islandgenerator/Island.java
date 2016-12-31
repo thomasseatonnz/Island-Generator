@@ -63,6 +63,7 @@ public class Island {
 				final int res = 150;
 				final float thickness = 0.023f;
 
+				
 				if (IslandGenerator.renderMode == RenderingMode.TOPOLINES) {
 					if (i > waterLevel) {
 						int ii = (int) (i * 1000d);
@@ -71,18 +72,35 @@ public class Island {
 						int cc = (int) ((i + thickness) * 1000d);
 						int ccc = cc % res;
 
-						if ((cc - ccc) != (ii - iii))
-							c = new Color(0x856537FF); 	// Brown Topo Lines
-						else
-							c = new Color(0xc9e99dFF); 	// Green Land
-					} else if (i > waterLevel - thickness) {
-						c = new Color(0x856537FF); 		// Brown Topo Lines at Water level
-					} else {
-						c = new Color(0xe6f6fcFF); // Water
+						if ((cc - ccc) != (ii - iii)) // Brown Topo Lines
+							c = new Color(0x856537FF);
+						else{ //Land
+							final float a = (1.0f-0.0f)/(1.0f-waterLevel); //Constants for normalising equation
+							final float b = 1.0f - a * 1.0f;
+							
+							float ic = ((float) ((ii - iii) / 1000f)); //current level
+							float nic =  a * ic + b; //Normalised value of ic
+							
+							final float scale = 0.7f;
+							
+							float nr = lerp((0.7882f*scale), 1.0f, nic);
+							float nb = lerp((0.9137f*scale), 1.0f, nic);
+							float ng = lerp((0.6157f*scale), 1.0f, nic);
+							
+							c = new Color(nr, nb, ng, 1.0f);
+						}
+					} else if (i > waterLevel - thickness) { //Topolines
+						c = new Color(0x856537FF);
+					} else { //water
+						c = new Color(0xe6f6fcFF);
 					}
 
+					
 				} else if (IslandGenerator.renderMode == RenderingMode.CONTOURCOLOR) {
-					if (i > waterLevel) {
+					final float beachBiomeSize = 0.035f;
+					if(i > waterLevel && i < waterLevel+beachBiomeSize){
+						c = new Color(0xffeb96FF);
+					} else if (i > waterLevel) {
 						int ii = (int) (i * 1000d);
 						int iii = ii % res;
 						
@@ -105,9 +123,10 @@ public class Island {
 					} else {
 						c = new Color(0xe6f6fcFF); // Water
 					}
-				} else {
+					
+					
+				} else //Simplex Noise Map
 					c = new Color(i, i, i, 1.0f);
-				}
 
 				pixels.setColor(c);
 				pixels.drawPixel(x, y);

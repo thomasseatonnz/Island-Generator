@@ -6,9 +6,7 @@ public class SimplexNoise { // Simplex noise in 2D, 3D
 	private static long seed = 1;
 	private static Random rand;
 
-	private static Grad grad3[] = { new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0),
-			new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1), new Grad(0, 1, 1),
-			new Grad(0, -1, 1), new Grad(0, 1, -1), new Grad(0, -1, -1) };
+	private static Grad grad3[] = { new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0), new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1), new Grad(0, 1, 1), new Grad(0, -1, 1), new Grad(0, 1, -1), new Grad(0, -1, -1) };
 
 	private static short rand255() {
 		return (short) rand.nextInt(256);

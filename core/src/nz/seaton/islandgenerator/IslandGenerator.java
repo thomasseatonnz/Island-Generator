@@ -17,7 +17,7 @@ public class IslandGenerator extends ApplicationAdapter {
 	public static float AMPLITUDE = 800f;
 	public static float PERSISTANCE = 0.7f;
 	
-	public static RenderingMode renderMode = RenderingMode.TOPOLINES;
+	public static RenderingMode renderMode = RenderingMode.CONTOURCOLOR;
 
 	double[][] islandTemplate;
 
@@ -83,6 +83,8 @@ public class IslandGenerator extends ApplicationAdapter {
 			
 			island.dispose();
 			island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, System.currentTimeMillis());
+			
+//			island.createTexture();
 			
 			long tf = System.currentTimeMillis() - t0;
 			System.out.println("Generated new texture in " + tf + "ms\n");
