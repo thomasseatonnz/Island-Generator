@@ -12,10 +12,12 @@ public class IslandGenerator extends ApplicationAdapter {
 	public final static int WINDOW_WIDTH = 1280;
 	public final static int WINDOW_HEIGHT = 720;
 
-	public static int OCTAVES = 1;
+	public static int OCTAVES = 10;
 	public static float FREQUENCY = 0.0005f;
 	public static float AMPLITUDE = 800f;
 	public static float PERSISTANCE = 0.7f;
+	
+	public static RenderingMode renderMode = RenderingMode.TOPOLINES;
 
 	double[][] islandTemplate;
 
@@ -49,23 +51,38 @@ public class IslandGenerator extends ApplicationAdapter {
 		renderer.draw(island.getTex(), 0, 0);
 		renderer.end();
 	}
+	
+	public void changeRenderMode(RenderingMode m){
+		renderMode = m;
+		island.createTexture();
+	}
 
 	public void update() {
 
 		// Generate new map
+		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+			
+			if(renderMode == RenderingMode.GRAYSCALE)
+				changeRenderMode(RenderingMode.TOPOLINES);
+			else if (renderMode == RenderingMode.TOPOLINES)
+				changeRenderMode(RenderingMode.CONTOURCOLOR);
+			else 
+				changeRenderMode(RenderingMode.GRAYSCALE);
+		}
+		
 		if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-//		if(System.currentTimeMillis() - last > 1000){
+//		if(System.currentTimeMillis() - last > 1000){ //Reloads map every 1 second
 			long t0 = System.currentTimeMillis();
 			System.out.println("Generating new texture");
 			
-			//These are here for the conveniece of testing new variations
+			//These are here for the convenience of testing new variations
 			OCTAVES = 10;
 			FREQUENCY = 0.0005f;
 			AMPLITUDE = 800f;
 			PERSISTANCE = 0.7f;
-
-			island.generate();
-			island.createTexture();
+			
+			island.dispose();
+			island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, System.currentTimeMillis());
 			
 			long tf = System.currentTimeMillis() - t0;
 			System.out.println("Generated new texture in " + tf + "ms\n");
