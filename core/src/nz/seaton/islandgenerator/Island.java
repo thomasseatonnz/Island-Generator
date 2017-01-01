@@ -62,7 +62,6 @@ public class Island {
 				
 				if(heightmap[x][y] > waterLevel && heightmap[x][y] < waterLevel+beachBiomeSize && Math.random() > 0.999f){
 					birdSpawners.add(new Spawner(SpawnType.BIRD, x, y));
-					System.out.print("\nNew Bird Spawner Created with " + birdSpawners.get(birdSpawners.size()-1).entities.size() + "\n");
 				}
 				
 			}

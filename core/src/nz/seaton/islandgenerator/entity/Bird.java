@@ -5,20 +5,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Bird extends Entity{
-	Texture tex;
+	static Texture tex;
 	
 	double angle = 0.0;
 	boolean clockwise;
 	double speed;
 	double angspeed;
 	
-	public Bird(double xx, double yy) {
-		super(xx, yy);
-		
-		clockwise = (Math.random() > 0.5) ? true : false;
-		speed = Math.random();
-		angspeed = Math.random() * 0.15;
-		
+	static {
 		Pixmap pixels = new Pixmap(5, 3, Pixmap.Format.RGBA8888);
 		pixels.setColor(0.2f,  0.2f,  0.2f, 1.0f);
 		pixels.drawLine(0, 0, 2, 3);
@@ -26,6 +20,14 @@ public class Bird extends Entity{
 		tex = new Texture(pixels);
 		
 		pixels.dispose();
+	}
+	
+	public Bird(double xx, double yy) {
+		super(xx, yy);
+		
+		clockwise = (Math.random() > 0.5) ? true : false;
+		speed = Math.random();
+		angspeed = Math.random() * 0.15;
 	}
 
 	public void update(long step) {
