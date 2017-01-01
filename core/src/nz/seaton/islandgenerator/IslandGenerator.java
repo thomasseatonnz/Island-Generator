@@ -16,6 +16,8 @@ public class IslandGenerator extends ApplicationAdapter {
 	public static float AMPLITUDE = 800f;
 	public static float PERSISTANCE = 0.7f;
 	
+	public static boolean DEBUG = true;
+	
 	public static RenderingMode renderMode = RenderingMode.CONTOURCOLOR;
 
 	SpriteBatch renderer;
@@ -45,7 +47,7 @@ public class IslandGenerator extends ApplicationAdapter {
 
 		
 		renderer.begin();
-		renderer.draw(island.getTex(), 0, 0);
+		island.render(renderer);
 		renderer.end();
 	}
 	
@@ -87,6 +89,8 @@ public class IslandGenerator extends ApplicationAdapter {
 			System.out.println("Generated new texture in " + tf + "ms\n");
 			last = System.currentTimeMillis();
 		}
+		
+		island.update(1);
 	}
 
 	@Override

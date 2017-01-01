@@ -1,8 +1,11 @@
 package nz.seaton.islandgenerator;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Island {
 
@@ -13,6 +16,15 @@ public class Island {
 	private long seed;
 
 	private Texture tex;
+	
+	private ArrayList<Spawner> birdSpawners;
+	
+	//----------
+	final float waterLevel = 0.05f;
+	final int res = 150;
+	final float thickness = 0.023f;
+	final float beachBiomeSize = 0.035f;
+	//----------
 
 	static {
 		System.out.println("Creating Island Template");
@@ -34,6 +46,7 @@ public class Island {
 		
 		heightmap = new double[w][h];
 		SimplexNoise.init(seed, w, h);
+		birdSpawners = new ArrayList<Spawner>();
 
 		double f = IslandGenerator.FREQUENCY;
 		double a = IslandGenerator.AMPLITUDE;
@@ -46,9 +59,14 @@ public class Island {
 				heightmap[x][y] += islandTemplate[x][y];
 				if (heightmap[x][y] < 0)
 					heightmap[x][y] = 0;
+				
+				if(heightmap[x][y] > waterLevel && heightmap[x][y] < waterLevel+beachBiomeSize && Math.random() > 0.999f){
+					birdSpawners.add(new Spawner(SpawnType.BIRD, x, y));
+					System.out.print("\nNew Bird Spawner Created with " + birdSpawners.get(birdSpawners.size()-1).entities.size() + "\n");
+				}
+				
 			}
 		}
-		
 		System.out.println("New heightmap generated in " + (System.currentTimeMillis()-last) + "ms\n");
 	}
 
@@ -63,11 +81,6 @@ public class Island {
 			for (int y = 0; y < pixels.getHeight(); y++) {
 				float i = (float) heightmap[x][y];
 				Color c = new Color();
-
-				final float waterLevel = 0.05f;
-				final int res = 150;
-				final float thickness = 0.023f;
-
 				
 				if (IslandGenerator.renderMode == RenderingMode.TOPOLINES) {
 					if (i > waterLevel) {
@@ -102,9 +115,8 @@ public class Island {
 
 					
 				} else if (IslandGenerator.renderMode == RenderingMode.CONTOURCOLOR) {
-					final float beachBiomeSize = 0.035f;
 					if(i > waterLevel && i < waterLevel+beachBiomeSize){
-						c = new Color(0xffeb96FF);
+						c = new Color(0xffeb96FF); //Beach
 					} else if (i > waterLevel) {
 						int ii = (int) (i * 1000d);
 						int iii = ii % res;
@@ -144,8 +156,22 @@ public class Island {
 		System.out.println("New texture generated in " + (System.currentTimeMillis()-last) + "ms\n");
 	}
 	
+	public void update(long step){
+		IslandGenerator.DEBUG = false;
+		for(int i = 0; i < birdSpawners.size(); i++){
+			birdSpawners.get(i).update(step);
+		}
+	}
+	
 	private float lerp(float start, float end, float x){
 		return start*(1-x)+end*x;
+	}
+	
+	public void render(SpriteBatch r){
+		r.draw(tex, 0, 0);
+		for(int i = 0; i < birdSpawners.size(); i++){
+			birdSpawners.get(i).render(r);
+		}
 	}
 
 	public Texture getTex() {
@@ -154,6 +180,7 @@ public class Island {
 
 	public void dispose() {
 		tex.dispose();
+		birdSpawners.clear();
 	}
 
 	private static void createIslandTemplate() {
