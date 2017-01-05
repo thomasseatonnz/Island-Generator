@@ -6,6 +6,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
+import nz.seaton.islandgenerator.island.Island;
 
 public class IslandGenerator extends ApplicationAdapter {
 
@@ -22,6 +25,7 @@ public class IslandGenerator extends ApplicationAdapter {
 	public static RenderingMode renderMode = RenderingMode.CONTOURCOLOR;
 
 	SpriteBatch renderer;
+	ShapeRenderer shape;
 	
 	Island island;
 	
@@ -34,6 +38,7 @@ public class IslandGenerator extends ApplicationAdapter {
 		Gdx.graphics.setResizable(false);
 		
 		renderer = new SpriteBatch();
+		shape = new ShapeRenderer();
 		
 		island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, "seed".hashCode());
 	}
@@ -50,9 +55,11 @@ public class IslandGenerator extends ApplicationAdapter {
 		font.getData().setScale(1.5f);
 		
 		renderer.begin();
-		island.render(renderer, font);
+		shape.begin(ShapeRenderer.ShapeType.Line);
+		island.render(renderer, font, shape);
+		shape.end();
 		renderer.end();
-		
+
 		font.dispose();
 	}
 	
@@ -66,12 +73,14 @@ public class IslandGenerator extends ApplicationAdapter {
 		// Generate new map
 		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
 			
-			if(renderMode == RenderingMode.GRAYSCALE)
+			if(renderMode == RenderingMode.ISLAND_TEMPLATE)
 				changeRenderMode(RenderingMode.TOPOLINES);
 			else if (renderMode == RenderingMode.TOPOLINES)
 				changeRenderMode(RenderingMode.CONTOURCOLOR);
-			else 
+			else if(renderMode == RenderingMode.CONTOURCOLOR)
 				changeRenderMode(RenderingMode.GRAYSCALE);
+			else
+				changeRenderMode(RenderingMode.ISLAND_TEMPLATE);
 		}
 		
 		if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
@@ -102,5 +111,6 @@ public class IslandGenerator extends ApplicationAdapter {
 	public void dispose() {
 		renderer.dispose();
 		island.dispose();
+		shape.dispose();
 	}
 }

@@ -33,7 +33,7 @@ public class SimplexNoise { // Simplex noise in 2D, 3D
 	private static short permMod12[];
 	private static int num = 512;
 
-	static void init(long s, int w, int h) {
+	public static void init(long s, int w, int h) {
 		num = w * h;
 		newSeed(s);
 	}
