@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Island {
@@ -14,6 +15,7 @@ public class Island {
 	private double[][] heightmap;
 	private int w, h;
 	private long seed;
+	public String name;
 
 	private Texture tex;
 	
@@ -66,6 +68,8 @@ public class Island {
 				
 			}
 		}
+		
+		name = PlaceName.generatePlaceName(seed);
 		System.out.println("New heightmap generated in " + (System.currentTimeMillis()-last) + "ms\n");
 	}
 
@@ -166,11 +170,14 @@ public class Island {
 		return start*(1-x)+end*x;
 	}
 	
-	public void render(SpriteBatch r){
+	public void render(SpriteBatch r, BitmapFont font){
 		r.draw(tex, 0, 0);
 		for(int i = 0; i < birdSpawners.size(); i++){
 			birdSpawners.get(i).render(r);
 		}
+		
+		font.setColor(Color.BLACK);
+		font.draw(r, name + " Island", 50, 50);
 	}
 
 	public Texture getTex() {
