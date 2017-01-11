@@ -9,6 +9,7 @@ import nz.seaton.islandgenerator.IslandGenerator;
 import nz.seaton.islandgenerator.PlaceName;
 import nz.seaton.islandgenerator.RenderingMode;
 import nz.seaton.islandgenerator.SimplexNoise;
+import nz.seaton.islandgenerator.Util;
 import nz.seaton.islandgenerator.island.IslandTemplate.Type;
 
 public class Island {
@@ -17,7 +18,7 @@ public class Island {
 
 	public double[][] heightmap;
 	public Color[][] colormap;
-	private int w, h;
+	public int w, h;
 	private long seed;
 	public String name;
 	
@@ -108,9 +109,9 @@ public class Island {
 
 							final float scale = 0.7f;
 
-							float nr = lerp((0.7882f * scale), 1.0f, nic);
-							float nb = lerp((0.9137f * scale), 1.0f, nic);
-							float ng = lerp((0.6157f * scale), 1.0f, nic);
+							float nr = Util.lerp((0.7882f * scale), 1.0f, nic);
+							float nb = Util.lerp((0.9137f * scale), 1.0f, nic);
+							float ng = Util.lerp((0.6157f * scale), 1.0f, nic);
 
 							c = new Color(nr, nb, ng, 1.0f);
 						}
@@ -143,9 +144,9 @@ public class Island {
 
 						final float scale = 0.8f;
 
-						float nr = lerp((0.7882f * scale), 1.0f, nic);
-						float nb = lerp((0.9137f * scale), 1.0f, nic);
-						float ng = lerp((0.6157f * scale), 1.0f, nic);
+						float nr = Util.lerp((0.7882f * scale), 1.0f, nic);
+						float nb = Util.lerp((0.9137f * scale), 1.0f, nic);
+						float ng = Util.lerp((0.6157f * scale), 1.0f, nic);
 
 						c = new Color(nr, nb, ng, 1.0f);
 					} else {
@@ -182,10 +183,6 @@ public class Island {
 		tide += 0.005*(Math.sin(((double)time /(2.0f*Math.PI))));
 		
 		createTexture();
-	}
-
-	public float lerp(float start, float end, float x) {
-		return start * (1 - x) + end * x;
 	}
 
 	public void render(SpriteBatch r, BitmapFont font, ShapeRenderer shape) {
