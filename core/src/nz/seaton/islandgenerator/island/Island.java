@@ -1,8 +1,6 @@
 package nz.seaton.islandgenerator.island;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -17,17 +15,16 @@ public class Island {
 
 	IslandTemplate template;
 
-	private double[][] heightmap;
+	public double[][] heightmap;
+	public Color[][] colormap;
 	private int w, h;
 	private long seed;
 	public String name;
-
-	private Texture tex;
 	
 	// private ArrayList<Spawner> birdSpawners;
 
 	// ----------
-	final float waterLevel = 0.05f;
+	public final float waterLevel = 0.05f;
 	final int res = 150;
 	final float thickness = 0.023f;
 	final float beachBiomeSize = 0.035f;
@@ -50,6 +47,7 @@ public class Island {
 		long last = System.currentTimeMillis();
 
 		heightmap = new double[w][h];
+		colormap = new Color[w][h];
 		template = new MountainTemplate(w, h, seed, 1);
 
 		SimplexNoise.init(seed, w, h);
@@ -81,13 +79,9 @@ public class Island {
 
 	public void createTexture() {
 		long last = System.currentTimeMillis();
-		if (tex != null)
-			tex.dispose();
 
-		Pixmap pixels = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-
-		for (int x = 0; x < pixels.getWidth(); x++) {
-			for (int y = 0; y < pixels.getHeight(); y++) {
+		for (int x = 0; x < w; x++) {
+			for (int y = 0; y < h; y++) {
 				float i = (float) heightmap[x][y];
 				Color c = new Color();
 
@@ -127,7 +121,7 @@ public class Island {
 					}
 
 				} else if (IslandGenerator.renderMode == RenderingMode.CONTOURCOLOR) {
-					if (i > tide && i < tide + beachBiomeSize) {
+					if (i < tide + beachBiomeSize) {
 						c = new Color(0xffeb96FF); // Beach
 					} else if (i > tide) {
 						int ii = (int) (i * 1000d);
@@ -172,13 +166,9 @@ public class Island {
 						c = new Color(0.0f, Math.abs(i) * 0.3f, Math.abs(i) * 0.3f, 1.0f);
 				}
 
-				pixels.setColor(c);
-				pixels.drawPixel(x, y);
+				colormap[x][y] = c;
 			}
 		}
-
-		tex = new Texture(pixels);
-		pixels.dispose();
 
 		System.out.println("New texture generated in " + (System.currentTimeMillis() - last) + "ms\n");
 	}
@@ -199,7 +189,6 @@ public class Island {
 	}
 
 	public void render(SpriteBatch r, BitmapFont font, ShapeRenderer shape) {
-		r.draw(tex, 0, 0);
 		// for(int i = 0; i < birdSpawners.size(); i++){
 		// birdSpawners.get(i).render(r);
 		// }
@@ -219,12 +208,7 @@ public class Island {
 		}
 	}
 
-	public Texture getTex() {
-		return tex;
-	}
-
 	public void dispose() {
-		tex.dispose();
 		// birdSpawners.clear();
 	}
 }
