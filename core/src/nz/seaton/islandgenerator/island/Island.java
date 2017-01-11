@@ -23,7 +23,7 @@ public class Island {
 	public String name;
 
 	private Texture tex;
-
+	
 	// private ArrayList<Spawner> birdSpawners;
 
 	// ----------
@@ -32,6 +32,9 @@ public class Island {
 	final float thickness = 0.023f;
 	final float beachBiomeSize = 0.035f;
 	// ----------
+	
+	private double tide = waterLevel;
+	private long time = 0;
 
 	public Island(int ww, int hh, long s) {
 		w = ww;
@@ -47,7 +50,7 @@ public class Island {
 		long last = System.currentTimeMillis();
 
 		heightmap = new double[w][h];
-		template = new MountainTemplate(w, h, seed, 2);
+		template = new MountainTemplate(w, h, seed, 1);
 
 		SimplexNoise.init(seed, w, h);
 		// birdSpawners = new ArrayList<Spawner>();
@@ -73,7 +76,7 @@ public class Island {
 		}
 
 		name = PlaceName.generatePlaceName(seed);
-		System.out.println("New heightmap generated in " + (System.currentTimeMillis() - last) + "ms\n");
+		System.out.println("New heightmap generated in " + (System.currentTimeMillis() - last) + "ms");
 	}
 
 	public void createTexture() {
@@ -89,7 +92,7 @@ public class Island {
 				Color c = new Color();
 
 				if (IslandGenerator.renderMode == RenderingMode.TOPOLINES) {
-					if (i > waterLevel) {
+					if (i > tide) {
 						int ii = (int) (i * 1000d);
 						int iii = ii % res;
 
@@ -99,7 +102,7 @@ public class Island {
 						if ((cc - ccc) != (ii - iii)) // Brown Topo Lines
 							c = new Color(0x856537FF);
 						else { // Land
-							final float a = (1.0f - 0.0f) / (1.0f - waterLevel); // Constants
+							final float a = (float) ((1.0f - 0.0f) / (1.0f - tide)); // Constants
 																					// for
 																					// normalising
 																					// equation
@@ -117,23 +120,23 @@ public class Island {
 
 							c = new Color(nr, nb, ng, 1.0f);
 						}
-					} else if (i > waterLevel - thickness) { // Topolines
+					} else if (i > tide - thickness) { // Topolines
 						c = new Color(0x856537FF);
 					} else { // water
 						c = new Color(0xe6f6fcFF);
 					}
 
 				} else if (IslandGenerator.renderMode == RenderingMode.CONTOURCOLOR) {
-					if (i > waterLevel && i < waterLevel + beachBiomeSize) {
+					if (i > tide && i < tide + beachBiomeSize) {
 						c = new Color(0xffeb96FF); // Beach
-					} else if (i > waterLevel) {
+					} else if (i > tide) {
 						int ii = (int) (i * 1000d);
 						int iii = ii % res;
 
 						float ic = ((float) ((ii - iii) / 1000f)); // current
 																	// level
 
-						final float a = (1.0f - 0.0f) / (1.0f - waterLevel); // Constants
+						final float a = (float) ((1.0f - 0.0f) / (1.0f - tide)); // Constants
 																				// for
 																				// normalising
 																				// equation
@@ -184,9 +187,14 @@ public class Island {
 		// for(int i = 0; i < birdSpawners.size(); i++){
 		// birdSpawners.get(i).update(step);
 		// }
+		
+		time += 1;
+		tide += 0.005*(Math.sin(((double)time /(2.0f*Math.PI))));
+		
+		createTexture();
 	}
 
-	private float lerp(float start, float end, float x) {
+	public float lerp(float start, float end, float x) {
 		return start * (1 - x) + end * x;
 	}
 

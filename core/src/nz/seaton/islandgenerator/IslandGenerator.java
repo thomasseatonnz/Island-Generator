@@ -20,7 +20,7 @@ public class IslandGenerator extends ApplicationAdapter {
 	public static float AMPLITUDE = 800f;
 	public static float PERSISTANCE = 0.7f;
 	
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	public static RenderingMode renderMode = RenderingMode.CONTOURCOLOR;
 
@@ -57,6 +57,10 @@ public class IslandGenerator extends ApplicationAdapter {
 		renderer.begin();
 		shape.begin(ShapeRenderer.ShapeType.Line);
 		island.render(renderer, font, shape);
+		
+//		shape.ellipse(WINDOW_WIDTH/2 - 200, WINDOW_HEIGHT/2 - 200, 400, 400);
+//		shape.ellipse(WINDOW_WIDTH/2 - 300, WINDOW_HEIGHT/2 - 300, 600, 600);
+		
 		shape.end();
 		renderer.end();
 
@@ -85,8 +89,6 @@ public class IslandGenerator extends ApplicationAdapter {
 		
 		if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 //		if(System.currentTimeMillis() - last > 1000){ //Reloads map every 1 second
-			long t0 = System.currentTimeMillis();
-			System.out.println("Generating new texture");
 			
 			//These are here for the convenience of testing new variations
 			OCTAVES = 10;
@@ -97,10 +99,6 @@ public class IslandGenerator extends ApplicationAdapter {
 			island.dispose();
 			island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, System.currentTimeMillis());
 			
-//			island.createTexture();
-			
-			long tf = System.currentTimeMillis() - t0;
-			System.out.println("Generated new texture in " + tf + "ms\n");
 			last = System.currentTimeMillis();
 		}
 		
