@@ -8,6 +8,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -22,6 +24,8 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.BufferUtils;
+import com.badlogic.gdx.utils.ScreenUtils;
 
 import nz.seaton.islandgenerator.island.Island;
 
@@ -204,6 +208,10 @@ public class IslandGenerator extends ApplicationAdapter {
 		if (Gdx.input.isKeyPressed(Input.Keys.D))
 			cam.translate(0.1f, 0f, 0f);
 		cam.update();
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
+			Util.screenshot();
+		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
 			System.out.println("asd");
