@@ -74,7 +74,7 @@ public class IslandGenerator extends ApplicationAdapter {
 		cam.update();
 
 		environment = new Environment();
-		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1.0f));
+		environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.0f));
 		sun = new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0, 1, 0);
 		environment.add(sun);
 
@@ -150,7 +150,7 @@ public class IslandGenerator extends ApplicationAdapter {
 		System.out.println(chunkCount + " chunks!");
 
 		builder.begin();
-		MeshPartBuilder meshBuilder = builder.part("part2", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.ColorPacked, new Material());
+		MeshPartBuilder meshBuilder = builder.part("ocean1", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.ColorPacked, new Material());
 		float waterLevel = island.waterLevel * 100;
 		
 		meshBuilder.setColor(new Color(0x064273FF));
@@ -170,14 +170,22 @@ public class IslandGenerator extends ApplicationAdapter {
 	public void render() {
 		camController.update();
 		
+		//Day Night Cycle
 		time += 1;
 		sun.setDirection((float)Math.sin(time/200f), (float)Math.cos(time/200f), 0f);
+		float f = (float)((-0.5 * Math.cos(time/200f)) + 0.5);
+		Gdx.gl.glClearColor(0.5294f*f, 0.8078f*f, 0.9215f*f, 1.0f);
+		
+		float tideTimeScale = 100f;
+		float tideHeightScale = 0.6f;
+		oceanInstance.transform.translate(new Vector3(0f, -(float)(tideHeightScale*(Math.sin((time-1)/tideTimeScale))), 0f));
+		oceanInstance.transform.translate(new Vector3(0f, (float)(tideHeightScale*(Math.sin(time/tideTimeScale))), 0f));
+		oceanInstance.calculateTransforms();
 		
 		update();
 
-		Gdx.gl.glClearColor(0.5294f, 0.8078f, 0.9215f, 1.0f);
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
 
 		mBatch.begin(cam);
 		for (ModelInstance isi : islandInstances)
