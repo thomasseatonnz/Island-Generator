@@ -41,7 +41,7 @@ public class IslandGenerator extends ApplicationAdapter {
 
 	PerspectiveCamera cam;
 	CameraInputController camController;
-	
+
 	Environment environment;
 	DirectionalLight sun;
 
@@ -54,7 +54,7 @@ public class IslandGenerator extends ApplicationAdapter {
 
 	Island island;
 
-	long last = 0;
+	long lastFPS = System.currentTimeMillis();
 	float time;
 
 	@Override
@@ -87,29 +87,30 @@ public class IslandGenerator extends ApplicationAdapter {
 		islandInstances = new ArrayList<ModelInstance>();
 
 		int res = 5;
-		float scl = 0.5f;
+		float scl = 1f;
 		float factor = res * scl;
 		int chunkSize = 20;
-		
+
 		int chunkCount = 0;
 
 		float xoffset = (island.w * scl) / 2;
 		float zoffset = (island.h * scl) / 2;
 
 		ModelBuilder builder = new ModelBuilder();
-		
-		for (int cx = 0; cx < island.w/res; cx += chunkSize) {
-			for (int cy = 0; cy < island.h/res; cy += chunkSize) {
+
+		for (int cx = 0; cx < island.w / res; cx += chunkSize) {
+			for (int cy = 0; cy < island.h / res; cy += chunkSize) {
 				chunkCount++;
-				
+
 				builder.begin();
 
-				MeshPartBuilder meshBuilder = builder.part("chunk" + chunkCount, GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.ColorPacked, new Material());
+				MeshPartBuilder meshBuilder = builder.part("chunk" + chunkCount, GL20.GL_TRIANGLES, Usage.Position | 
+						Usage.Normal | Usage.ColorPacked, new Material());
 
 				Matrix4 transformMatrix = new Matrix4();
 				transformMatrix.translate(-xoffset, 0, -zoffset);
 				meshBuilder.setVertexTransform(transformMatrix);
-				
+
 				for (int x = cx; (x < (island.w / res) - 1) && x < (cx + chunkSize); x++) {
 					for (int y = cy; (y < (island.h / res) - 1) && y < (cy + chunkSize); y++) {
 						// v1
@@ -150,9 +151,10 @@ public class IslandGenerator extends ApplicationAdapter {
 		System.out.println(chunkCount + " chunks!");
 
 		builder.begin();
-		MeshPartBuilder meshBuilder = builder.part("ocean1", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.ColorPacked, new Material());
+		MeshPartBuilder meshBuilder = builder.part("ocean1", GL20.GL_TRIANGLES, Usage.Position | 
+				Usage.Normal | Usage.ColorPacked, new Material());
 		float waterLevel = island.waterLevel * 100;
-		
+
 		meshBuilder.setColor(new Color(0x064273FF));
 		VertexInfo o1 = new VertexInfo().setPos(-10000, waterLevel, -10000).setNor(0, 1, 0);
 		VertexInfo o2 = new VertexInfo().setPos(10000, waterLevel, -10000).setNor(0, 1, 0);
@@ -169,23 +171,24 @@ public class IslandGenerator extends ApplicationAdapter {
 	@Override
 	public void render() {
 		camController.update();
-		
-		//Day Night Cycle
+
+		// Day Night Cycle
 		time += 1;
-		sun.setDirection((float)Math.sin(time/200f), (float)Math.cos(time/200f), 0f);
-		float f = (float)((-0.5 * Math.cos(time/200f)) + 0.5);
-		Gdx.gl.glClearColor(0.5294f*f, 0.8078f*f, 0.9215f*f, 1.0f);
-		
+		sun.setDirection((float) Math.sin(time / 200f), (float) Math.cos(time / 200f), 0f);
+		float f = (float) ((-0.5 * Math.cos(time / 200f)) + 0.5);
+		Gdx.gl.glClearColor(0.5294f * f, 0.8078f * f, 0.9215f * f, 1.0f);
+
 		float tideTimeScale = 100f;
 		float tideHeightScale = 0.6f;
-		oceanInstance.transform.translate(new Vector3(0f, -(float)(tideHeightScale*(Math.sin((time-1)/tideTimeScale))), 0f));
-		oceanInstance.transform.translate(new Vector3(0f, (float)(tideHeightScale*(Math.sin(time/tideTimeScale))), 0f));
+		oceanInstance.transform.translate(new Vector3(0f, -(float) (tideHeightScale * (Math.sin((time - 1) / tideTimeScale))), 0f));
+		oceanInstance.transform.translate(new Vector3(0f, (float) (tideHeightScale * (Math.sin(time / tideTimeScale))), 0f));
 		oceanInstance.calculateTransforms();
-		
+
 		update();
 
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | 
+				(Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 
 		mBatch.begin(cam);
 		for (ModelInstance isi : islandInstances)
@@ -201,6 +204,11 @@ public class IslandGenerator extends ApplicationAdapter {
 	}
 
 	public void update() {
+		 if(System.currentTimeMillis() - lastFPS > 5000){
+			 System.out.println(Gdx.graphics.getFramesPerSecond());
+			 lastFPS = System.currentTimeMillis();
+		 }
+		
 		if (Gdx.input.isKeyPressed(Input.Keys.W))
 			cam.translate(0f, 0f, 0.1f);
 		if (Gdx.input.isKeyPressed(Input.Keys.A))
@@ -210,15 +218,13 @@ public class IslandGenerator extends ApplicationAdapter {
 		if (Gdx.input.isKeyPressed(Input.Keys.D))
 			cam.translate(0.1f, 0f, 0f);
 		cam.update();
-		
-		if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
 			Util.screenshot();
 		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
 			System.out.println("asd");
-			// if(System.currentTimeMillis() - last > 1000){ //Reloads map every
-			// 1 second
 
 			// These are here for the convenience of testing new variations
 			OCTAVES = 10;
@@ -229,7 +235,7 @@ public class IslandGenerator extends ApplicationAdapter {
 			island.dispose();
 			island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, System.currentTimeMillis());
 
-			last = System.currentTimeMillis();
+			
 		}
 
 		// REMOVED FOR DEBUG

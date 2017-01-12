@@ -11,7 +11,7 @@ public class DesktopLauncher {
 		
 		config.width = IslandGenerator.WINDOW_WIDTH;
 		config.height = IslandGenerator.WINDOW_HEIGHT;
-		config.samples = 4;
+		config.samples = 8;
 		
 		new LwjglApplication(new IslandGenerator(), config);
 	}
