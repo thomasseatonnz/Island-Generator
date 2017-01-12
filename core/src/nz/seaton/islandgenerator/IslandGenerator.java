@@ -8,8 +8,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
@@ -24,8 +22,6 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.BufferUtils;
-import com.badlogic.gdx.utils.ScreenUtils;
 
 import nz.seaton.islandgenerator.island.Island;
 
@@ -66,7 +62,6 @@ public class IslandGenerator extends ApplicationAdapter {
 		Gdx.graphics.setTitle("Island Generator");
 		Gdx.graphics.setWindowedMode(WINDOW_WIDTH, WINDOW_HEIGHT);
 		Gdx.graphics.setResizable(false);
-		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.graphics.setVSync(true);
 
 		island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, System.currentTimeMillis());
@@ -102,8 +97,6 @@ public class IslandGenerator extends ApplicationAdapter {
 		float zoffset = (island.h * scl) / 2;
 
 		ModelBuilder builder = new ModelBuilder();
-		
-		System.out.println((island.w*island.h)/(res * chunkSize) + " chunks expected!");
 		
 		for (int cx = 0; cx < island.w/res; cx += chunkSize) {
 			for (int cy = 0; cy < island.h/res; cy += chunkSize) {
@@ -159,11 +152,12 @@ public class IslandGenerator extends ApplicationAdapter {
 		builder.begin();
 		MeshPartBuilder meshBuilder = builder.part("part2", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.ColorPacked, new Material());
 		float waterLevel = island.waterLevel * 100;
-
-		VertexInfo o1 = new VertexInfo().setPos(-10000, waterLevel, -10000).setNor(0, 1, 0).setCol(new Color(0x064273FF));
-		VertexInfo o2 = new VertexInfo().setPos(10000, waterLevel, -10000).setNor(0, 1, 0).setCol(new Color(0x064273FF));
-		VertexInfo o3 = new VertexInfo().setPos(10000, waterLevel, 10000).setNor(0, 1, 0).setCol(new Color(0x064273FF));
-		VertexInfo o4 = new VertexInfo().setPos(-10000, waterLevel, 10000).setNor(0, 1, 0).setCol(new Color(0x064273FF));
+		
+		meshBuilder.setColor(new Color(0x064273FF));
+		VertexInfo o1 = new VertexInfo().setPos(-10000, waterLevel, -10000).setNor(0, 1, 0);
+		VertexInfo o2 = new VertexInfo().setPos(10000, waterLevel, -10000).setNor(0, 1, 0);
+		VertexInfo o3 = new VertexInfo().setPos(10000, waterLevel, 10000).setNor(0, 1, 0);
+		VertexInfo o4 = new VertexInfo().setPos(-10000, waterLevel, 10000).setNor(0, 1, 0);
 
 		meshBuilder.rect(o4, o3, o2, o1);
 		oceanModel = builder.end();
