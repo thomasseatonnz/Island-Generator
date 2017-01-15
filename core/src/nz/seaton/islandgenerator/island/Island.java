@@ -32,7 +32,6 @@ public class Island {
 	// ----------
 	
 	private double tide = waterLevel;
-	private long time = 0;
 
 	public Island(int ww, int hh, long s) {
 		w = ww;
@@ -52,7 +51,6 @@ public class Island {
 		template = new MountainTemplate(w, h, seed, 1);
 
 		SimplexNoise.init(seed, w, h);
-		// birdSpawners = new ArrayList<Spawner>();
 
 		double f = IslandGenerator.FREQUENCY;
 		double a = IslandGenerator.AMPLITUDE;
@@ -63,14 +61,6 @@ public class Island {
 			for (int y = 0; y < h; y++) {
 				heightmap[x][y] = SimplexNoise.OctaveSimplex(x, y, o, p, f, a);
 				heightmap[x][y] += template.getTemplate(x, y);
-				if (heightmap[x][y] < 0)
-					heightmap[x][y] = 0;
-
-				// if (heightmap[x][y] > waterLevel && heightmap[x][y] <
-				// waterLevel + beachBiomeSize && Math.random() > 0.999f) {
-				// birdSpawners.add(new Spawner(SpawnType.BIRD, x, y));
-				// }
-
 			}
 		}
 
@@ -175,21 +165,9 @@ public class Island {
 	}
 
 	public void update(long step) {
-		// for(int i = 0; i < birdSpawners.size(); i++){
-		// birdSpawners.get(i).update(step);
-		// }
-		
-		time += 1;
-		tide += 0.005*(Math.sin(((double)time /(2.0f*Math.PI))));
-		
-		createTexture();
 	}
 
 	public void render(SpriteBatch r, BitmapFont font, ShapeRenderer shape) {
-		// for(int i = 0; i < birdSpawners.size(); i++){
-		// birdSpawners.get(i).render(r);
-		// }
-
 		font.setColor(Color.BLACK);
 		font.draw(r, name + " Island", 50, 50);
 
@@ -206,6 +184,5 @@ public class Island {
 	}
 
 	public void dispose() {
-		// birdSpawners.clear();
 	}
 }
