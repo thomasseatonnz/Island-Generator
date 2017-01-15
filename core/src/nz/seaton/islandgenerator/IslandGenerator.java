@@ -6,6 +6,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import nz.seaton.islandgenerator.island.Island;
@@ -50,9 +52,11 @@ public class IslandGenerator extends ApplicationAdapter {
 		Gdx.graphics.setVSync(true);
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		BitmapFont font = new BitmapFont();
-		font.getData().setScale(1.5f);
+		
+		FreeTypeFontGenerator fGenerator = new FreeTypeFontGenerator(Gdx.files.internal("assets/Roboto-Regular.ttf"));
+		FreeTypeFontParameter fParam = new FreeTypeFontParameter();
+		fParam.size = 30;
+		BitmapFont font = fGenerator.generateFont(fParam);
 		
 		renderer.begin();
 		shape.begin(ShapeRenderer.ShapeType.Line);
