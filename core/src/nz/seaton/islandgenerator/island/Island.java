@@ -24,17 +24,13 @@ public class Island {
 
 	private Texture tex;
 	
-	// private ArrayList<Spawner> birdSpawners;
-
-	// ----------
+	// ---------- BIOME DETAILS
 	final float waterLevel = 0.05f;
 	final int res = 150;
 	final float thickness = 0.023f;
 	final float beachBiomeSize = 0.035f;
-	// ----------
-	
 	private double tide = waterLevel;
-	private long time = 0;
+	// ----------
 
 	public Island(int ww, int hh, long s) {
 		w = ww;
@@ -53,7 +49,6 @@ public class Island {
 		template = new MountainTemplate(w, h, seed, 1);
 
 		SimplexNoise.init(seed, w, h);
-		// birdSpawners = new ArrayList<Spawner>();
 
 		double f = IslandGenerator.FREQUENCY;
 		double a = IslandGenerator.AMPLITUDE;
@@ -66,12 +61,6 @@ public class Island {
 				heightmap[x][y] += template.getTemplate(x, y);
 				if (heightmap[x][y] < 0)
 					heightmap[x][y] = 0;
-
-				// if (heightmap[x][y] > waterLevel && heightmap[x][y] <
-				// waterLevel + beachBiomeSize && Math.random() > 0.999f) {
-				// birdSpawners.add(new Spawner(SpawnType.BIRD, x, y));
-				// }
-
 			}
 		}
 
@@ -184,14 +173,7 @@ public class Island {
 	}
 
 	public void update(long step) {
-		// for(int i = 0; i < birdSpawners.size(); i++){
-		// birdSpawners.get(i).update(step);
-		// }
 		
-		time += 1;
-		tide += 0.005*(Math.sin(((double)time /(2.0f*Math.PI))));
-		
-		createTexture();
 	}
 
 	public float lerp(float start, float end, float x) {
@@ -200,16 +182,9 @@ public class Island {
 
 	public void render(SpriteBatch r, BitmapFont font, ShapeRenderer shape) {
 		r.draw(tex, 0, 0);
-		// for(int i = 0; i < birdSpawners.size(); i++){
-		// birdSpawners.get(i).render(r);
-		// }
-
-		font.setColor(Color.BLACK);
-		font.draw(r, name + " Island", 50, 50);
-
-		shape.setColor(Color.RED);
 
 		if (template.getType() == Type.MOUNTAIN && IslandGenerator.DEBUG) {
+			shape.setColor(Color.RED);
 			int peaks = ((MountainTemplate)template).peaks;
 			int div = peaks + 2;
 			for (int i = 1; i < peaks + 2; i++) {
@@ -225,6 +200,5 @@ public class Island {
 
 	public void dispose() {
 		tex.dispose();
-		// birdSpawners.clear();
 	}
 }

@@ -62,9 +62,6 @@ public class IslandGenerator extends ApplicationAdapter {
 		shape.begin(ShapeRenderer.ShapeType.Line);
 		island.render(renderer, font, shape);
 		
-//		shape.ellipse(WINDOW_WIDTH/2 - 200, WINDOW_HEIGHT/2 - 200, 400, 400);
-//		shape.ellipse(WINDOW_WIDTH/2 - 300, WINDOW_HEIGHT/2 - 300, 600, 600);
-		
 		shape.end();
 		renderer.end();
 
@@ -91,8 +88,7 @@ public class IslandGenerator extends ApplicationAdapter {
 				changeRenderMode(RenderingMode.ISLAND_TEMPLATE);
 		}
 		
-		if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-//		if(System.currentTimeMillis() - last > 1000){ //Reloads map every 1 second
+		if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
 			
 			//These are here for the convenience of testing new variations
 			OCTAVES = 10;
