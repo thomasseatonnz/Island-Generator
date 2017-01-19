@@ -38,7 +38,7 @@ public class UI {
 	VisLabel FPSLabel;
 
 	// Loading Widgets
-	VisLabel currentLoadLabel;
+	VisLabel loadingTitleLabel;
 	VisProgressBar progress;
 	VisLabel loadStateLabel;
 
@@ -144,9 +144,9 @@ public class UI {
 		labelStyle.background = VisUI.getSkin().getDrawable("button");
 
 		// "Loading..." label
-		currentLoadLabel = new VisLabel("Loading...", labelStyle);
-		currentLoadLabel.setAlignment(Align.center | Align.top);
-		table.add(currentLoadLabel).fill().width(400).height(30);
+		loadingTitleLabel = new VisLabel("Loading...", labelStyle);
+		loadingTitleLabel.setAlignment(Align.center | Align.top);
+		table.add(loadingTitleLabel).fill().width(400).height(30);
 		table.row();
 
 		// Loading Bar
@@ -385,11 +385,11 @@ public class UI {
 
 			long ti = System.currentTimeMillis() - last; //time interval
 			if (ti >= 1000 && ti < 2000) {
-				currentLoadLabel.setText("Loading.  ");
+				loadingTitleLabel.setText("Loading.  ");
 			} else if (ti >= 2000 && ti < 3000) {
-				currentLoadLabel.setText("Loading.. ");
+				loadingTitleLabel.setText("Loading.. ");
 			} else if (ti >= 3000) {
-				currentLoadLabel.setText("Loading...");
+				loadingTitleLabel.setText("Loading...");
 				last = System.currentTimeMillis();
 			}
 
