@@ -64,11 +64,6 @@ public class IslandGenerator extends ApplicationAdapter {
 			renderer.end();
 		}
 		ui.render();
-
-		if (System.currentTimeMillis() - last >= 2500) {
-			System.out.println(Gdx.graphics.getFramesPerSecond());
-			last = System.currentTimeMillis();
-		}
 	}
 
 	public void changeRenderMode(RenderingMode m) {

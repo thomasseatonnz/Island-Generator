@@ -23,26 +23,30 @@ public class UI {
 	int w, h;
 
 	public final boolean _DEBUG = false;
-	//DEBUG
+	// DEBUG
 	int count;
 
-	//Base Containers
+	// Base Containers
 	Stage stage;
 	VisTable islandOptionsTable;
 	VisTable simplexOptionsTable;
 	VisTable centerConsoleTable;
 	VisTable loadingBarTable;
-	
-	//Loading Widgets
+	VisTable FPSBox;
+
+	// FPS Widget
+	VisLabel FPSLabel;
+
+	// Loading Widgets
 	VisLabel currentLoadLabel;
 	VisProgressBar progress;
 	VisLabel loadStateLabel;
-	
-	//Other Loading Objects
+
+	// Other Loading Objects
 	public boolean loading = false;
 	float loadProgress = 0.0f;
-	
-	//TODO: sort this out
+
+	// TODO: sort this out
 	VisLabel islandNameLabel;
 
 	public UI(int _w, int _h) {
@@ -74,7 +78,7 @@ public class UI {
 
 		simplexOptionsTable.bottom().right().pad(10);
 		stage.addActor(simplexOptionsTable);
-		
+
 		// *** Center Console *** //
 		centerConsoleTable = new VisTable(true);
 		centerConsoleTable.setFillParent(true);
@@ -84,14 +88,14 @@ public class UI {
 
 		centerConsoleTable.bottom().pad(10);
 		stage.addActor(centerConsoleTable);
-		
+
 		// *** Center Console *** //
 		loadingBarTable = new VisTable();
 		loadingBarTable.setFillParent(true);
 		loadingBarTable.setDebug(_DEBUG);
-		
+
 		generateLoadingBar(generator, loadingBarTable);
-		
+
 		stage.addActor(loadingBarTable);
 		stage.addListener(new ClickListener() {
 			@Override
@@ -100,11 +104,36 @@ public class UI {
 				loadStateLabel.setText("Loading 'clicking'");
 			}
 		});
-		
+
+		// *** FPS Counter *** //
+		FPSBox = new VisTable();
+		FPSBox.setFillParent(true);
+		FPSBox.setDebug(_DEBUG);
+
+		generateFPSBox(generator, FPSBox);
+
+		FPSBox.top().left().pad(10);
+		stage.addActor(FPSBox);
+
 		// *** Clean Up *** //
 		generator.dispose();
 	}
-	
+
+	private void generateFPSBox(FreeTypeFontGenerator generator, VisTable table) {
+		FreeTypeFontParameter config = new FreeTypeFontParameter();
+		config.size = 35;
+		config.borderWidth = 1;
+		config.borderColor = Color.WHITE;
+		config.color = Color.BLACK;
+
+		LabelStyle labelStyle = new LabelStyle();
+		labelStyle.font = generator.generateFont(config);
+
+		FPSLabel = new VisLabel("0", labelStyle);
+		FPSLabel.setAlignment(Align.top | Align.left);
+		table.add(FPSLabel);
+	}
+
 	private void generateLoadingBar(FreeTypeFontGenerator generator, VisTable table) {
 		FreeTypeFontParameter config = new FreeTypeFontParameter();
 		config.size = 25;
@@ -113,26 +142,26 @@ public class UI {
 		labelStyle.font = generator.generateFont(config);
 		labelStyle.fontColor = Color.WHITE;
 		labelStyle.background = VisUI.getSkin().getDrawable("button");
-		
-		//"Loading..." label
+
+		// "Loading..." label
 		currentLoadLabel = new VisLabel("Loading...", labelStyle);
 		currentLoadLabel.setAlignment(Align.center | Align.top);
 		table.add(currentLoadLabel).fill().width(400).height(30);
 		table.row();
-		
-		//Loading Bar		
+
+		// Loading Bar
 		progress = new VisProgressBar(0.0f, 100f, 0.1f, false);
 		table.add(progress).fill();
 		table.row();
-		
-		//current load state
+
+		// current load state
 		config.size = 15;
 		labelStyle.font = generator.generateFont(config);
-		
+
 		loadStateLabel = new VisLabel("Creating Perlin Noise", labelStyle);
 		loadStateLabel.setAlignment(Align.center);
 		table.add(loadStateLabel).fill().height(30);
-		
+
 	}
 
 	private void generateCenterConsole(FreeTypeFontGenerator generator, VisTable table) {
@@ -176,7 +205,7 @@ public class UI {
 
 		VisTable optionsTable = new VisTable();
 		optionsTable.setDebug(_DEBUG);
-		
+
 		// SEED
 		LabelStyle optionLabelStyle = new LabelStyle();
 		config.size = 15;
@@ -343,30 +372,44 @@ public class UI {
 		stage.draw();
 	}
 
+	long last = System.currentTimeMillis();
+
 	public void update() {
-		
-		//Debug
-		if(loading){
+		FPSLabel.setText(String.valueOf(Gdx.graphics.getFramesPerSecond()));
+
+		// Debug
+		if (loading) {
 			count++;
-			loadProgress = (float)count/5;
+			loadProgress = (float) count / 5;
 			progress.setValue(loadProgress);
-			if(loadProgress >= 100){
+
+			long ti = System.currentTimeMillis() - last; //time interval
+			if (ti >= 1000 && ti < 2000) {
+				currentLoadLabel.setText("Loading.  ");
+			} else if (ti >= 2000 && ti < 3000) {
+				currentLoadLabel.setText("Loading.. ");
+			} else if (ti >= 3000) {
+				currentLoadLabel.setText("Loading...");
+				last = System.currentTimeMillis();
+			}
+
+			if (loadProgress >= 100) {
 				loading = false;
 				loadProgress = 0;
 				count = 0;
-			} else if(loadProgress > 80)
+			} else if (loadProgress > 80)
 				loadStateLabel.setText("Making a meme");
-			else if(loadProgress > 70)
+			else if (loadProgress > 70)
 				loadStateLabel.setText("eating carrots");
-			else if(loadProgress > 60)
+			else if (loadProgress > 60)
 				loadStateLabel.setText("Taking note");
-			else if(loadProgress > 40)
+			else if (loadProgress > 40)
 				loadStateLabel.setText("count++");
-			else if(loadProgress > 20)
+			else if (loadProgress > 20)
 				loadStateLabel.setText("taking pictures of cute dogs");
 		}
-		//--end Debug
-		
+		// --end Debug
+
 		loadingBarTable.setVisible(loading);
 		simplexOptionsTable.setVisible(!loading);
 		centerConsoleTable.setVisible(!loading);
