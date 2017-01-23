@@ -37,12 +37,14 @@ public class IslandGenerator extends ApplicationAdapter {
 		Gdx.graphics.setTitle("Island Generator");
 		Gdx.graphics.setWindowedMode(WINDOW_WIDTH, WINDOW_HEIGHT);
 		Gdx.graphics.setResizable(false);
+		Gdx.graphics.setVSync(false);
 
 		renderer = new SpriteBatch();
 		shape = new ShapeRenderer();
 		ui = new UI(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-		island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, "seed".hashCode());
+		island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, "seed".hashCode(), ui);
+		ui.setIsland(island);
 	}
 
 	long lastFPS = System.currentTimeMillis();
@@ -51,7 +53,6 @@ public class IslandGenerator extends ApplicationAdapter {
 	public void render() {
 		update();
 
-		Gdx.graphics.setVSync(true);
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -72,9 +73,7 @@ public class IslandGenerator extends ApplicationAdapter {
 	}
 
 	public void update() {
-		// Generate new map
 		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-
 			if (renderMode == RenderingMode.ISLAND_TEMPLATE)
 				changeRenderMode(RenderingMode.TOPOLINES);
 			else if (renderMode == RenderingMode.TOPOLINES)
@@ -83,20 +82,6 @@ public class IslandGenerator extends ApplicationAdapter {
 				changeRenderMode(RenderingMode.GRAYSCALE);
 			else
 				changeRenderMode(RenderingMode.ISLAND_TEMPLATE);
-		}
-
-		if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
-
-			// These are here for the convenience of testing new variations
-			OCTAVES = 10;
-			FREQUENCY = 0.0005f;
-			AMPLITUDE = 800f;
-			PERSISTANCE = 0.7f;
-
-			island.dispose();
-			island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, System.currentTimeMillis());
-
-			last = System.currentTimeMillis();
 		}
 
 		island.update(1);

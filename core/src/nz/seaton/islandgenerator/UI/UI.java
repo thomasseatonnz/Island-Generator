@@ -17,10 +17,19 @@ import com.kotcrab.vis.ui.widget.VisSlider;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextButton.VisTextButtonStyle;
+
+import nz.seaton.islandgenerator.IslandGenerator;
+import nz.seaton.islandgenerator.island.Island;
+
 import com.kotcrab.vis.ui.widget.VisTextField;
 
 public class UI {
 	int w, h;
+	Island island;
+
+	public void setIsland(Island i) {
+		island = i;
+	}
 
 	public final boolean _DEBUG = false;
 	// DEBUG
@@ -34,6 +43,21 @@ public class UI {
 	VisTable loadingBarTable;
 	VisTable FPSBox;
 
+	// Island Setting Widgets
+	VisTextField seedText;
+	VisSlider beachSizeSlider;
+	VisSlider waterLevelSlider;
+	VisSlider overxSlider;
+	VisSlider plusxSlider;
+	VisSlider peakSlider;
+	VisLabel islandNameLabel;
+
+	// Simplex Settings Widgets
+	VisSlider octSlider;
+	VisSlider freqSlider;
+	VisSlider ampSlider;
+	VisSlider persSlider;
+
 	// FPS Widget
 	VisLabel FPSLabel;
 
@@ -45,9 +69,6 @@ public class UI {
 	// Other Loading Objects
 	public boolean loading = false;
 	float loadProgress = 0.0f;
-
-	// TODO: sort this out
-	VisLabel islandNameLabel;
 
 	public UI(int _w, int _h) {
 		w = _w;
@@ -97,13 +118,6 @@ public class UI {
 		generateLoadingBar(generator, loadingBarTable);
 
 		stage.addActor(loadingBarTable);
-		stage.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				loading = true;
-				loadStateLabel.setText("Loading 'clicking'");
-			}
-		});
 
 		// *** FPS Counter *** //
 		FPSBox = new VisTable();
@@ -176,6 +190,7 @@ public class UI {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				generateButton.setChecked(false);
+				generateIslandWithSettings();
 			}
 		});
 
@@ -183,7 +198,13 @@ public class UI {
 
 		VisTextButtonStyle debugButtonStyle = new VisTextButtonStyle(VisUI.getSkin().getDrawable("button"), VisUI.getSkin().getDrawable("button-down"), VisUI.getSkin().getDrawable("button-blue-down"), generator.generateFont(config));
 		debugButtonStyle.over = VisUI.getSkin().getDrawable("button-over");
-		VisTextButton debugButton = new VisTextButton("Debug Disabled", debugButtonStyle);
+		final VisTextButton debugButton = new VisTextButton("Debug Disabled", debugButtonStyle);
+		debugButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				IslandGenerator.DEBUG = debugButton.isChecked();
+			}
+		});
 
 		table.add(debugButton).width(220);
 	}
@@ -193,7 +214,7 @@ public class UI {
 		LabelStyle islandNameStyle = new LabelStyle();
 
 		FreeTypeFontParameter config = new FreeTypeFontParameter();
-		config.size = 30;
+		config.size = 25;
 
 		islandNameStyle.font = generator.generateFont(config);
 		islandNameStyle.fontColor = Color.WHITE;
@@ -201,6 +222,7 @@ public class UI {
 
 		islandNameLabel = new VisLabel("Island Name", islandNameStyle);
 		islandNameLabel.setAlignment(Align.center);
+		islandNameLabel.setWrap(true);
 		islandOptionsTable.add(islandNameLabel).fill();
 
 		VisTable optionsTable = new VisTable();
@@ -215,24 +237,34 @@ public class UI {
 
 		VisLabel seedLabel = new VisLabel("seed: ", optionLabelStyle);
 		seedLabel.setAlignment(Align.right);
-		VisTextField seedText = new VisTextField("seed");
+		seedText = new VisTextField("seed");
 		seedText.setAlignment(Align.center);
 
 		optionsTable.add(seedLabel).fill();
 		optionsTable.add(seedText);
 		optionsTable.row();
-
-		// Beach Size
+		
+		//Peaks
 		SliderStyle sliderStyle = new SliderStyle();
 		sliderStyle.background = VisUI.getSkin().getDrawable("window-noborder");
 		sliderStyle.knob = VisUI.getSkin().getDrawable("slider-knob");
 		sliderStyle.knobDown = VisUI.getSkin().getDrawable("slider-knob-down");
 		sliderStyle.knobOver = VisUI.getSkin().getDrawable("slider-knob-over");
 		sliderStyle.disabledKnob = VisUI.getSkin().getDrawable("slider-knob-disabled");
+		
+		VisLabel peaksLabel = new VisLabel("peaks: ", optionLabelStyle);
+		peaksLabel.setAlignment(Align.right);
+		peakSlider = new VisSlider(0.0f, 6f, 1.0f, false, sliderStyle);
+		peakSlider.setValue(1f);
+		
+		optionsTable.row();
+		optionsTable.add(peaksLabel).fill();
+		optionsTable.add(peakSlider).fill();
 
+		// Beach Size
 		VisLabel beachSizeLabel = new VisLabel("beach size: ", optionLabelStyle);
 		beachSizeLabel.setAlignment(Align.right);
-		VisSlider beachSizeSlider = new VisSlider(0.0f, 1.0f, 0.01f, false, sliderStyle);
+		beachSizeSlider = new VisSlider(0.0f, 1.0f, 0.01f, false, sliderStyle);
 		beachSizeSlider.setValue(0.035f);
 
 		optionsTable.row();
@@ -242,7 +274,7 @@ public class UI {
 		// waterLevel
 		VisLabel waterLevelLabel = new VisLabel("water level: ", optionLabelStyle);
 		waterLevelLabel.setAlignment(Align.right);
-		VisSlider waterLevelSlider = new VisSlider(-0.5f, 1.0f, 0.01f, false, sliderStyle);
+		waterLevelSlider = new VisSlider(-0.5f, 1.0f, 0.01f, false, sliderStyle);
 		waterLevelSlider.setValue(0.05f);
 
 		optionsTable.row();
@@ -266,7 +298,7 @@ public class UI {
 		// d/x
 		VisLabel overxLabel = new VisLabel("d/x: ", optionLabelStyle);
 		overxLabel.setAlignment(Align.right);
-		VisSlider overxSlider = new VisSlider(-5, 20f, 0.5f, false, sliderStyle);
+		overxSlider = new VisSlider(-5, 20f, 0.5f, false, sliderStyle);
 		overxSlider.setValue(10f);
 
 		optionsTable.row();
@@ -276,7 +308,7 @@ public class UI {
 		// +x
 		VisLabel plusxLabel = new VisLabel("+x: ", optionLabelStyle);
 		plusxLabel.setAlignment(Align.right);
-		VisSlider plusxSlider = new VisSlider(0, 10f, 0.01f, false, sliderStyle);
+		plusxSlider = new VisSlider(0, 10f, 0.01f, false, sliderStyle);
 		plusxSlider.setValue(1.5f);
 
 		optionsTable.row();
@@ -322,7 +354,7 @@ public class UI {
 
 		VisLabel octLabel = new VisLabel("Octaves: ", optionLabelStyle);
 		octLabel.setAlignment(Align.right);
-		VisSlider octSlider = new VisSlider(1, 50f, 1f, false, sliderStyle);
+		octSlider = new VisSlider(1, 50f, 1f, false, sliderStyle);
 		octSlider.setValue(10f);
 
 		optionsTable.row();
@@ -333,7 +365,7 @@ public class UI {
 
 		VisLabel freqLabel = new VisLabel("Frequency: ", optionLabelStyle);
 		freqLabel.setAlignment(Align.right);
-		VisSlider freqSlider = new VisSlider(0, 0.1f, 0.00001f, false, sliderStyle);
+		freqSlider = new VisSlider(0, 0.1f, 0.00001f, false, sliderStyle);
 		freqSlider.setValue(0.0005f);
 
 		optionsTable.row();
@@ -344,7 +376,7 @@ public class UI {
 
 		VisLabel ampLabel = new VisLabel("Amplitude: ", optionLabelStyle);
 		ampLabel.setAlignment(Align.right);
-		VisSlider ampSlider = new VisSlider(0f, 2000f, 1f, false, sliderStyle);
+		ampSlider = new VisSlider(0f, 2000f, 1f, false, sliderStyle);
 		ampSlider.setValue(800f);
 
 		optionsTable.row();
@@ -355,7 +387,7 @@ public class UI {
 
 		VisLabel persLabel = new VisLabel("Persistance: ", optionLabelStyle);
 		persLabel.setAlignment(Align.right);
-		VisSlider persSlider = new VisSlider(0, 1f, 0.01f, false, sliderStyle);
+		persSlider = new VisSlider(0, 1f, 0.01f, false, sliderStyle);
 		persSlider.setValue(0.7f);
 
 		optionsTable.row();
@@ -377,39 +409,6 @@ public class UI {
 	public void update() {
 		FPSLabel.setText(String.valueOf(Gdx.graphics.getFramesPerSecond()));
 
-		// Debug
-		if (loading) {
-			count++;
-			loadProgress = (float) count / 5;
-			progress.setValue(loadProgress);
-
-			long ti = System.currentTimeMillis() - last; //time interval
-			if (ti >= 1000 && ti < 2000) {
-				loadingTitleLabel.setText("Loading.  ");
-			} else if (ti >= 2000 && ti < 3000) {
-				loadingTitleLabel.setText("Loading.. ");
-			} else if (ti >= 3000) {
-				loadingTitleLabel.setText("Loading...");
-				last = System.currentTimeMillis();
-			}
-
-			if (loadProgress >= 100) {
-				loading = false;
-				loadProgress = 0;
-				count = 0;
-			} else if (loadProgress > 80)
-				loadStateLabel.setText("Making a meme");
-			else if (loadProgress > 70)
-				loadStateLabel.setText("eating carrots");
-			else if (loadProgress > 60)
-				loadStateLabel.setText("Taking note");
-			else if (loadProgress > 40)
-				loadStateLabel.setText("count++");
-			else if (loadProgress > 20)
-				loadStateLabel.setText("taking pictures of cute dogs");
-		}
-		// --end Debug
-
 		loadingBarTable.setVisible(loading);
 		simplexOptionsTable.setVisible(!loading);
 		centerConsoleTable.setVisible(!loading);
@@ -421,5 +420,65 @@ public class UI {
 	public void dispose() {
 		stage.dispose();
 		VisUI.dispose();
+	}
+
+	long totalLoad;
+	long current;
+
+	public void updateLoadingStatus(String s) {
+		loadStateLabel.setText(s);
+	}
+
+	/**
+	 * Sets load bar progress. setTotalLoadValue() must be called first must be given a float between 0.0 and the total load value
+	 */
+	public void updateLoadProgress(int p) {
+		current = p;
+		progress.setValue((float) ((double) current / (double) totalLoad) * 100.0f);
+	}
+
+	public void addLoadCycle() {
+		current++;
+		progress.setValue((float) ((double) current / (double) totalLoad) * 100.0f);
+	}
+
+	public void addLoadCycle(int cycles) {
+		current += cycles;
+		progress.setValue((float) ((double) current / (double) totalLoad) * 100.0f);
+	}
+
+	public void setTotalLoadValue(long i) {
+		totalLoad = i;
+	}
+
+	public void startLoading(long i) {
+		totalLoad = i;
+		loading = true;
+		progress.setValue(0);
+	}
+
+	public void endLoading() {
+		loading = false;
+	}
+
+	public void generateIslandWithSettings() {
+		IslandGenerator.OCTAVES = (int) octSlider.getValue();
+		IslandGenerator.AMPLITUDE = ampSlider.getValue();
+		IslandGenerator.FREQUENCY = freqSlider.getValue();
+		IslandGenerator.PERSISTANCE = persSlider.getValue();
+
+		island.beachBiomeSize = beachSizeSlider.getValue();
+		island.waterLevel = waterLevelSlider.getValue();
+		island.seed = seedText.getText().hashCode();
+		island.overx = overxSlider.getValue();
+		island.plusx = plusxSlider.getValue();
+		island.peaks = (int) peakSlider.getValue();
+
+		island.dispose();
+		island.recreate();
+	}
+	
+	public void setIslandName(String name){
+		islandNameLabel.setText(name);
 	}
 }
