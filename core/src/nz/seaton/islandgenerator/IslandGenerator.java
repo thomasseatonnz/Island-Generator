@@ -1,6 +1,7 @@
 package nz.seaton.islandgenerator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -51,6 +52,10 @@ public class IslandGenerator extends ApplicationAdapter {
 
 	ArrayList<Model> islandModels;
 	ArrayList<ModelInstance> islandInstances;
+
+	// DEBUG
+	ArrayList<Model> arrowModels;
+	ArrayList<ModelInstance> arrowInstances;
 
 	Model oceanModel;
 	ModelInstance oceanInstance;
@@ -160,11 +165,15 @@ public class IslandGenerator extends ApplicationAdapter {
 					float v1H = 100 * (float) island.heightmap[x * res][y * res];
 					Vector3 v1P = new Vector3(x * factor, v1H, y * factor);
 					Vector3 v1N = calcNormal(x, y, res);
+					if (v1H > island.waterLevel * 100f)
+						queueArrow(v1P, v1N);
 					VertexInfo v1 = new VertexInfo().setPos(v1P).setNor(v1N).setCol(island.colormap[x * res][y * res]);
 
 					float v2H = 100 * (float) island.heightmap[x * res][(y + 1) * res];
 					Vector3 v2P = new Vector3(x * factor, v2H, (y + 1) * factor);
 					Vector3 v2N = calcNormal(x, y + 1, res);
+					if (v2H > island.waterLevel * 100f)
+						queueArrow(v2P, v2N);
 					VertexInfo v2 = new VertexInfo().setPos(v2P).setNor(v2N).setCol(island.colormap[x * res][(y + 1) * res]);
 
 					meshBuilder.index(meshBuilder.vertex(v1));
@@ -178,6 +187,27 @@ public class IslandGenerator extends ApplicationAdapter {
 		// }
 		System.out.println(chunkCount + " chunks!");
 
+		// Arrow
+		arrowModels = new ArrayList<Model>();
+		arrowInstances = new ArrayList<ModelInstance>();
+
+//		builder.begin();
+//		int i = 0;
+//		for (Arrow a : arrowQueue) {
+//			MeshPartBuilder meshBuilder = builder.part("Arrow" + i, GL20.GL_LINES, Usage.Position | Usage.ColorPacked, new Material());
+//			Matrix4 transformMatrix = new Matrix4();
+//			transformMatrix.translate(-xoffset, 0, -zoffset);
+//
+//			meshBuilder.setVertexTransform(transformMatrix);
+//			meshBuilder.setColor(Color.PURPLE);
+//
+//			meshBuilder.line(a.start, a.end);
+//			i++;
+//		}
+//		arrowModels.add(builder.end());
+//		arrowInstances.add(new ModelInstance(arrowModels.get(arrowModels.size() - 1)));
+
+		// Ocean
 		builder.begin();
 		MeshPartBuilder meshBuilder = builder.part("ocean1", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal | Usage.ColorPacked, new Material());
 		float waterLevel = island.waterLevel * 100;
@@ -193,6 +223,21 @@ public class IslandGenerator extends ApplicationAdapter {
 
 		oceanInstance = new ModelInstance(oceanModel);
 
+	}
+
+	private class Arrow {
+		public Vector3 start, end;
+
+		Arrow(Vector3 pos, Vector3 normal) {
+			this.start = pos;
+			this.end = new Vector3((pos.x + normal.x * 3), (pos.y + normal.y * 3), (pos.z + normal.z * 3));
+		}
+	}
+
+	List<Arrow> arrowQueue = new ArrayList<Arrow>();
+
+	private void queueArrow(Vector3 pos, Vector3 normal) {
+		arrowQueue.add(new Arrow(pos, normal));
 	}
 
 	public Vector3 calcNormal(int x, int y, int res) {
@@ -213,9 +258,8 @@ public class IslandGenerator extends ApplicationAdapter {
 		float heightR = (float) island.heightmap[x + res][y];
 		float heightD = (float) island.heightmap[x][y - res];
 		float heightU = (float) island.heightmap[x][y + res];
-
-		Vector3 norm = new Vector3(heightL - heightR, 2f, heightD - heightU);
-		norm.nor();
+		
+		Vector3 norm = new Vector3(heightL - heightR, 0.5f , heightD - heightU).nor();
 
 		return norm;
 	}
@@ -244,6 +288,9 @@ public class IslandGenerator extends ApplicationAdapter {
 		mBatch.begin(cam);
 		for (ModelInstance isi : islandInstances)
 			mBatch.render(isi, environment);
+		if (DEBUG)
+			for (ModelInstance isi : arrowInstances)
+				mBatch.render(isi);
 		mBatch.render(oceanInstance, environment);
 		mBatch.end();
 
@@ -269,15 +316,15 @@ public class IslandGenerator extends ApplicationAdapter {
 	}
 
 	@Override
-	public void dispose(){
+	public void dispose() {
 		if (island != null)
 			island.dispose();
 		if (ui != null)
 			ui.dispose();
 		for (Model i : islandModels)
-			if(i != null)
+			if (i != null)
 				i.dispose();
-		if(oceanModel != null)
+		if (oceanModel != null)
 			oceanModel.dispose();
 	}
 }
