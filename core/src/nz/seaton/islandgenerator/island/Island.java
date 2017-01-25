@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import nz.seaton.islandgenerator.IslandGenerator;
 import nz.seaton.islandgenerator.PlaceName;
@@ -23,19 +22,17 @@ public class Island {
 
 	private Texture tex;
 
-	// ---------- BIOME DETAILS
+	// ---------- RENDERING DETAILS
 	final int res = 150;
 	final float thickness = 0.023f;
 
-	// ----------
+	// ---------- ISLAND GENERATOR VARIABLES
 	public long seed;
 	public float waterLevel = 0.05f;
 	public float beachBiomeSize = 0.035f;
 	public int peaks = 1;
 	public float overx = 10;
 	public float plusx = 1.5f;
-
-	private double tide = waterLevel;
 
 	public Island(int ww, int hh, long s, UI ui) {
 		w = ww;
@@ -106,7 +103,7 @@ public class Island {
 				Color c = new Color();
 
 				if (IslandGenerator.renderMode == RenderingMode.TOPOLINES) {
-					if (i > tide) {
+					if (i > waterLevel) {
 						int ii = (int) (i * 1000d);
 						int iii = ii % res;
 
@@ -116,7 +113,7 @@ public class Island {
 						if ((cc - ccc) != (ii - iii)) // Brown Topo Lines
 							c = new Color(0x856537FF);
 						else { // Land
-							final float a = (float) ((1.0f - 0.0f) / (1.0f - tide)); // Constants for normalising equation
+							final float a = (float) ((1.0f - 0.0f) / (1.0f - waterLevel)); // Constants for normalising equation
 							final float b = 1.0f - a * 1.0f;
 
 							float ic = ((float) ((ii - iii) / 1000f)); // current level
@@ -130,22 +127,22 @@ public class Island {
 
 							c = new Color(nr, nb, ng, 1.0f);
 						}
-					} else if (i > tide - thickness) { // Topolines
+					} else if (i > waterLevel - thickness) { // Topolines
 						c = new Color(0x856537FF);
 					} else { // water
 						c = new Color(0xe6f6fcFF);
 					}
 
 				} else if (IslandGenerator.renderMode == RenderingMode.CONTOURCOLOR) {
-					if (i > tide && i < tide + beachBiomeSize) {
+					if (i > waterLevel && i < waterLevel + beachBiomeSize) {
 						c = new Color(0xffeb96FF); // Beach
-					} else if (i > tide) {
+					} else if (i > waterLevel) {
 						int ii = (int) (i * 1000d);
 						int iii = ii % res;
 
 						float ic = ((float) ((ii - iii) / 1000f)); // current level
 
-						final float a = (float) ((1.0f - 0.0f) / (1.0f - tide)); // Constants for normalising equation
+						final float a = (float) ((1.0f - 0.0f) / (1.0f - waterLevel)); // Constants for normalising equation
 						final float b = 1.0f - a * 1.0f;
 
 						float nic = a * ic + b; // Normalised value of ic
@@ -200,7 +197,7 @@ public class Island {
 		return start * (1 - x) + end * x;
 	}
 
-	public void render(SpriteBatch r, ShapeRenderer shape) {
+	public void render(SpriteBatch r) {
 		if (tex != null)
 			r.draw(tex, 0, 0);
 	}
@@ -210,6 +207,7 @@ public class Island {
 	}
 
 	public void dispose() {
-		tex.dispose();
+		if (tex != null)
+			tex.dispose();
 	}
 }

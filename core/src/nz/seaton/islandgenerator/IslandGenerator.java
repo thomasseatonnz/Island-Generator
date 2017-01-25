@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import nz.seaton.islandgenerator.UI.UI;
 import nz.seaton.islandgenerator.island.Island;
@@ -25,7 +24,6 @@ public class IslandGenerator extends ApplicationAdapter {
 	public static RenderingMode renderMode = RenderingMode.CONTOURCOLOR;
 
 	SpriteBatch renderer;
-	ShapeRenderer shape;
 	UI ui;
 
 	Island island;
@@ -40,7 +38,6 @@ public class IslandGenerator extends ApplicationAdapter {
 		Gdx.graphics.setVSync(false);
 
 		renderer = new SpriteBatch();
-		shape = new ShapeRenderer();
 		ui = new UI(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 		island = new Island(WINDOW_WIDTH, WINDOW_HEIGHT, "seed".hashCode(), ui);
@@ -58,10 +55,7 @@ public class IslandGenerator extends ApplicationAdapter {
 
 		if (!ui.loading) {
 			renderer.begin();
-			shape.begin(ShapeRenderer.ShapeType.Line);
-			island.render(renderer, shape);
-
-			shape.end();
+			island.render(renderer);
 			renderer.end();
 		}
 		ui.render();
@@ -89,10 +83,12 @@ public class IslandGenerator extends ApplicationAdapter {
 	}
 
 	@Override
-	public void dispose() {
-		renderer.dispose();
-		island.dispose();
-		shape.dispose();
-		ui.dispose();
+	public void dispose() throws NullPointerException {
+		if (renderer != null)
+			renderer.dispose();
+		if (island != null)
+			island.dispose();
+		if (ui != null)
+			ui.dispose();
 	}
 }
